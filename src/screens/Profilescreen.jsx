@@ -30,7 +30,7 @@ function Profilescreen() {
                                 <br />
                                 <h1>Name: {user.name}</h1>
                                 <h1>Email: {user.email}</h1>
-                                <h1>isAdmin: {user.isAdmin ? 'yes' : 'no'}</h1>
+                                
                             </div>
                         </div>
                     </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Tabs, Modal, Input, Button } from 'antd';
+import { Tabs, Modal } from 'antd';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 
@@ -56,15 +56,7 @@ function Adminscreen() {
              <Users /> 
           </TabPane>
           
-          <TabPane tab='Edit Room' key='5'>
-            <Button className='btn btn-primary '  onClick={showModal}>
-              Edit
-            </Button>
-            <Modal title='Edit Room' visible={visible} onOk={handleOk} onCancel={handleCancel}>
-              <Input placeholder='Enter Room ID' value={roomId} onChange={handleRoomIdChange} />
-              {roomId && <EditRoom roomId={roomId} />}
-            </Modal>
-          </TabPane>
+         
         </Tabs>
       </div>
     </div>
@@ -142,85 +134,113 @@ export function Bookings() {
 
 
 
+
 export function Rooms() {
-    const [rooms, setRooms] = useState([]);
-    const [loader, setLoader] = useState(true);
+  const [rooms, setRooms] = useState([]);
+  const [loader, setLoader] = useState(true);
+  const [visible, setVisible] = useState(false);
+  const [selectedRoomId, setSelectedRoomId] = useState('');
 
-    const fetchData = async () => {
-        try {
-            const response = await fetch("/api/rooms/getallrooms");
-            const data = await response.json();
-            setRooms(data);
-            setLoader(false);
-        } catch (error) {
-            console.error(error);
-            setLoader(false);
-        }
-    };
+  const fetchData = async () => {
+    try {
+      const response = await fetch("/api/rooms/getallrooms");
+      const data = await response.json();
+      setRooms(data);
+      setLoader(false);
+    } catch (error) {
+      console.error(error);
+      setLoader(false);
+    }
+  };
 
-    useEffect(() => {
-        fetchData();
-    }, []);
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-    const handleDeleteRoom = async (roomId) => {
-        try {
-            await axios.delete(`/api/rooms/deleteroom/${roomId}`);
-            // After deletion, fetch and update the room list
-            fetchData();
-            Swal.fire("Success", "Room deleted successfully", "success");
-        } catch (error) {
-            console.error(error);
-            Swal.fire("Error", "Failed to delete room", "error");
-        }
-    };
+  const handleDeleteRoom = async (roomId) => {
+    try {
+      await axios.delete(`/api/rooms/deleteroom/${roomId}`);
+      fetchData();
+      Swal.fire("Success", "Room deleted successfully", "success");
+    } catch (error) {
+      console.error(error);
+      Swal.fire("Error", "Failed to delete room", "error");
+    }
+  };
 
-    return (
-        <div className="row">
-            <div className="col-md-12">
-                {loader && <Loader />}
-                <h1>Rooms</h1>
-                <table className='table table-border table-dark'>
-                    <thead className='bs'>
-                        <tr>
-                            <th>RoomID</th>
-                            <th>Name</th>
-                            <th>Type</th>
-                            <th>Rent Per Day</th>
-                            <th>Max Count</th>
-                            <th>Phone NO</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {rooms.length > 0 ? (
-                            rooms.map((room, index) => (
-                                <tr key={index}>
-                                    <td>{room._id}</td>
-                                    <td>{room.name}</td>
-                                    <td>{room.type}</td>
-                                    <td>{room.rentperday}</td>
-                                    <td>{room.maxcount}</td>
-                                    <td>{room.phonennumber}</td>
-                                    <td>
-                                        <button
-                                            className='btn btn-danger'
-                                            onClick={() => handleDeleteRoom(room._id)}
-                                        >
-                                            Delete
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="7">No rooms available</td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    );
+  const handleEditRoom = (roomId) => {
+    setVisible(true);
+    setSelectedRoomId(roomId);
+  };
+
+  const handleModalCancel = () => {
+    setVisible(false);
+    setSelectedRoomId('');
+  };
+
+  return (
+    <div className="row">
+      <div className="col-md-12">
+        {loader && <Loader />}
+        <h1>Rooms</h1>
+        <table className='table table-border table-dark'>
+          <thead className='bs'>
+            <tr>
+              <th>RoomID</th>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Rent Per Day</th>
+              <th>Max Count</th>
+              <th>Phone NO</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rooms.length > 0 ? (
+              rooms.map((room, index) => (
+                <tr key={index}>
+                  <td>{room._id}</td>
+                  <td>{room.name}</td>
+                  <td>{room.type}</td>
+                  <td>{room.rentperday}</td>
+                  <td>{room.maxcount}</td>
+                  <td>{room.phonennumber}</td>
+                  <td>
+                    <button
+                      className='btn btn-danger'
+                      onClick={() => handleDeleteRoom(room._id)}
+                    >
+                      Delete
+                    </button>
+                    <button
+                      className='btn btn-primary ml-2'
+                      onClick={() => handleEditRoom(room._id)}
+                    >
+                      Edit
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="7">No rooms available</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+
+        {/* EditRoom Modal */}
+        <Modal
+          title='Edit Room'
+          visible={visible}
+          onCancel={handleModalCancel}
+          footer={null}
+        >
+          <EditRoom roomId={selectedRoomId} />
+        </Modal>
+      </div>
+    </div>
+  );
 }
 
 

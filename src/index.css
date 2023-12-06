@@ -149,3 +149,15 @@ p{
 .bar{
   border-right: 8px solid white !important;
 }
+
+
+.carousel-item {
+  transition: opacity 1s ease; /* Adjust the duration and timing function as needed */
+}
+
+.bigimg {
+  max-height: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  display: block;
+}

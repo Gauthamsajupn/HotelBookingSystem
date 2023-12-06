@@ -48,7 +48,10 @@ function EditRoom({ roomId }) {
         title: 'Room Updated Successfully',
         showConfirmButton: false,
         timer: 1500,
-      });
+      }).then(() =>
+      {
+        window.location.reload();
+      })
     } catch (error) {
       console.error(error);
       setLoader(false);
